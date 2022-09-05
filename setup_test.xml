@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<setup>
+    <name>SinkTest</name>
+    <mqtt>
+        <port>1883</port>
+        <qos>2</qos>
+        <auth>off</auth>
+        <topics>
+            <collector>
+                <registration>/collector/registration/</registration>
+                <data>/collector/data/</data>
+            </collector>
+            <valves>
+                <control>/valves/control/</control>
+                <request>/valves/status/request/</request>
+                <response>/valves/status/response/</response>
+            </valves>
+            <irrigation>
+                <mode>/irrigation/mode/</mode>
+            </irrigation>
+        </topics>
+    </mqtt>
+    <mongo>
+        <db>Thuia</db>
+        <collections>
+            <readings>readings_test</readings>
+            <valves>valves_test</valves>
+            <users>users_test</users>
+            <irrigations>irrigations_test</irrigations>
+        </collections>
+    </mongo>
+</setup>
