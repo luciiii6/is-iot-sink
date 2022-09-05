@@ -7,8 +7,10 @@ import time
 class AllowedCollectors:
     def __init__(self):
         self.__collectors = {}
-        self.__expire_time = int(utils.get_setting("collectors/expireTime"))
-        self.__registration_enabled = True if utils.get_setting("collectors/registrationEnabled").lower() == "true" else False
+        try:
+            self.__expire_time = int(utils.get_setting("collectors/expireTime"))
+        except IndexError:
+            self.__expire_time = 3600
         self.__check_thread = threading.Thread(target=self.__check_all, daemon=True)
         self.__check_thread.start()
 
