@@ -17,5 +17,5 @@ class Settings:
 
     def set(self, name, value):
         self.__mutex.acquire()
-        value = dpath.util.set(self.__settings, name, value)
+        dpath.util.set(self.__settings, name, value)
         self.__mutex.release()
