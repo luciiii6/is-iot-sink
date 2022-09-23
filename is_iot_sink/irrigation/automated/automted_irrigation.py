@@ -1,5 +1,5 @@
 from is_iot_sink.allowed_collectors import AllowedCollectors
-from is_iot_sink.irrigation.mode import *
+from is_iot_sink.irrigation.irrigation_mode import *
 from is_iot_sink.irrigation.automated.flc import flc
 from is_iot_sink.irrigation.valves.valves_manager import ValveManager
 from is_iot_sink.irrigation.weather import *
@@ -21,7 +21,7 @@ class AutomatedIrrigation:
         self.__valve_manager = valve_manager
         self.__mongo_client = mongo_client
         self.__allowed_collectors = allowed_collectors
-        self.mode = Mode.AUTO
+        self.mode = IrrigationMode.AUTO
         self.weather = Weather(self.__settings.get("location/latitude"), self.__settings.get("location/longitude"))
         self.rain_fail_counter = 0
         self.running = False

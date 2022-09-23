@@ -7,7 +7,7 @@ from is_iot_sink.logger import LOG
 from queue import Queue, Empty
 from threading import Lock
 from is_iot_sink.settings import Settings
-import is_iot_sink.irrigation.mode as irr_mode #TODO: Make class methods
+from is_iot_sink.irrigation.irrigation_mode import IrrigationMode
 import threading
 import json
 import os
@@ -23,7 +23,7 @@ class Sink:
         self.__allowed_collectors = AllowedCollectors(self.__settings)
         self.__mqtt_client = MQTTClient(self.__settings)
         self.__irrigation_factory = IrrigationFactory(self.__settings, self.__valve_manager, self.__mongo_client, self.__allowed_collectors)
-        self.__irrigation = self.__irrigation_factory.create(irr_mode.str_to_mode(self.__settings.get("irrigation/initialMode").upper()))
+        self.__irrigation = self.__irrigation_factory.create(IrrigationMode.str_to_mode(self.__settings.get("irrigation/initialMode").upper()))
         self.__thread = threading.Thread(target = self.__process_data, daemon = True)
 
     def start(self):
@@ -74,7 +74,7 @@ class Sink:
                     LOG.err("Unaccepted collector with id: {}".format(payload["collectorId"]))
 
             elif (message.topic.startswith(self.__settings.get("mqtt/topics/valves/control"))):
-                if self.__irrigation.mode == irr_mode.Mode.AUTO:
+                if self.__irrigation.mode == IrrigationMode.AUTO:
                     LOG.info("Irrigation is in auto mode. Ignoring all valves control...")
                     continue
                 
@@ -97,13 +97,13 @@ class Sink:
                 self.__mqtt_client.publish(self.__settings.get("mqtt/topics/valves/response"), self.__valve_manager.get_status())
             
             elif (message.topic.startswith(self.__settings.get("mqtt/topics/irrigation/mode"))):
-                new_mode = irr_mode.str_to_mode(payload["mode"].upper())
+                new_mode = IrrigationMode.str_to_mode(payload["mode"].upper())
                 if (new_mode == None):
                     LOG.err("Invalid irrigation mode configuration!")
                     continue
 
                 if (new_mode == self.__irrigation.mode):
-                    LOG.info("Irrigation mode is already: [{}]".format(irr_mode.mode_to_str(self.__irrigation.mode)))
+                    LOG.info("Irrigation mode is already: [{}]".format(IrrigationMode.mode_to_str(self.__irrigation.mode)))
                 else:
                     LOG.info("Irrigation mode switched to: [{}]".format(payload["mode"].upper()))
                     self.__irrigation.stop()
