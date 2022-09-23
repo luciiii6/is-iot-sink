@@ -1,0 +1,22 @@
+name: SinkTest
+mqtt:
+  port: 1883
+  qos: 2
+  auth: 'off'
+  topics:
+    collector:
+      registration: /collector/registration/
+      data: /collector/data/
+    valves:
+      control: /valves/control/
+      request: /valves/status/request/
+      response: /valves/status/response/
+    irrigation:
+      mode: /irrigation/mode/
+mongo:
+  db: Thuia
+  collections:
+    readings: readings_test
+    valves: valves_test
+    users: users_test
+    irrigations: irrigations_test
