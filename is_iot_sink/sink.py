@@ -22,10 +22,9 @@ class Sink:
         self.__valve_manager = ValveManager(self.__settings, self.__mongo_client)
         self.__allowed_collectors = AllowedCollectors(self.__settings)
         self.__mqtt_client = MQTTClient(self.__settings)
-        self.__irrigation_factory = IrrigationFactory(self.__settings, self.__valve_manager, self.__mongo_client)
+        self.__irrigation_factory = IrrigationFactory(self.__settings, self.__valve_manager, self.__mongo_client, self.__allowed_collectors)
         self.__irrigation = self.__irrigation_factory.create(irr_mode.str_to_mode(self.__settings.get("irrigation/initialMode").upper()))
         self.__thread = threading.Thread(target = self.__process_data, daemon = True)
-
 
     def start(self):
         LOG.info("Sink application started.")
@@ -57,6 +56,8 @@ class Sink:
             except:
                 LOG.err("Invalid json format! [{}]".format(message.payload))
                 continue
+
+            # TODO: check for invalid keys
 
             LOG.info("<{}> [{}]".format(message.topic, payload))
             
@@ -106,7 +107,7 @@ class Sink:
                 else:
                     LOG.info("Irrigation mode switched to: [{}]".format(payload["mode"].upper()))
                     self.__irrigation.stop()
-                    self.__irrigation = IrrigationFactory().create(new_mode)
+                    self.__irrigation = self.__irrigation_factory.create(new_mode)
                     self.__irrigation.start()
 
             else:
