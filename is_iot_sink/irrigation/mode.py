@@ -22,6 +22,3 @@ def str_to_mode(str):
         return Mode.AUTO
     else:
         return None
-
-def initial_mode():
-    return str_to_mode(utils.get_setting("irrigation/initialMode").upper())

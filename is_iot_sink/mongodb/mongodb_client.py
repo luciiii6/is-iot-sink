@@ -1,16 +1,17 @@
 from bson import ObjectId
 from is_iot_sink import utils
 from is_iot_sink.logger import LOG
-from is_iot_sink.allowed_collectors import ac
+from is_iot_sink.settings import Settings
 import pymongo
 import os
 import time
 
 class MongoClient:
-    def __init__(self):
+    def __init__(self, settings: Settings):
+        self.__settings = settings
         self.client = pymongo.MongoClient(os.getenv('MONGODB_CONNECTION_STR'))
-        self.db = self.client[utils.get_setting("mongo/db")]
-        self.cols = utils.get_settings("mongo/collections")
+        self.db = self.client[self.__settings.get("mongo/db")]
+        self.cols = self.__settings.get("mongo/collections")
 
     def insert_one(self, doc, collection: str):
         col = self.db[collection]
@@ -18,19 +19,19 @@ class MongoClient:
         return result.inserted_id
 
     def update_finished_irrigation(self, id):
-        col = self.db[utils.get_setting("mongo/collections/irrigations")]
+        col = self.db[self.__settings.get("mongo/collections/irrigations")]
         result = col.update_one({'_id': ObjectId(id)}, {'$set': {'completed': True}})
 
     def admin_user_id(self):
-        col = self.db[utils.get_setting("mongo/collections/users")]
+        col = self.db[self.__settings.get("mongo/collections/users")]
         user = col.find_one({'UserName': 'admin'})
         return user['_id']
 
-    def read_last_readings(self):
-        col = self.db[utils.get_setting("mongo/collections/readings")]
+    def read_last_readings(self, collector_ids):
+        col = self.db[self.__settings.get("mongo/collections/readings")]
 
         last_readings = []
-        for id in ac.get_all():
+        for id in collector_ids:
             pipeline = [
                 {
                     '$match': {
@@ -54,7 +55,7 @@ class MongoClient:
                         'timestamp': -1
                     }
                 }, {
-                    '$limit': int(utils.get_setting("irrigation/automated/last_readings_count"))
+                    '$limit': int(self.__settings.get("irrigation/automated/last_readings_count"))
                 }
             ]
             readings = col.aggregate(pipeline)
@@ -65,5 +66,3 @@ class MongoClient:
 
     def __del__(self):
         self.client.close()
-
-mongo_client = MongoClient()
