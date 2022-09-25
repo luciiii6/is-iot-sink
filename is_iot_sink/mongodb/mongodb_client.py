@@ -10,7 +10,6 @@ class MongoClient:
         self.__settings = settings
         self.client = pymongo.MongoClient(os.getenv('MONGODB_CONNECTION_STR'))
         self.db = self.client[self.__settings.get("mongo/db")]
-        self.cols = self.__settings.get("mongo/collections")
 
     def insert_one(self, doc, collection: str):
         col = self.db[collection]
@@ -62,6 +61,10 @@ class MongoClient:
                 last_readings.append(reading)
 
         return last_readings
+
+    def cleanup(self):
+        for collection in self.__settings.get("mongo/collections").values():
+            self.db[collection].delete_many({})
 
     def __del__(self):
         self.client.close()

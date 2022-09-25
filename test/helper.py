@@ -2,6 +2,9 @@ import subprocess
 import os
 from dotenv import Dotenv
 from pathlib import Path
+from is_iot_sink.settings import Settings
+from is_iot_sink.mongodb.mongodb_client import MongoClient
+from threading import Lock
 
 class TestHelper:
     @classmethod
@@ -34,3 +37,14 @@ class TestHelper:
         env_file_path = Path(os.getenv('PROJECT_PATH') + '/.env.test')
         dotenv = Dotenv(env_file_path)
         os.environ.update(dotenv)
+
+    @classmethod
+    def default_test_settings(self):
+        self.__settings_mutex = Lock()
+        return Settings(os.getenv('PROJECT_PATH') + '/setup.yml', self.__settings_mutex)
+
+    @classmethod
+    def cleanup_database(self, settings: Settings):
+        MongoClient(settings).cleanup()
+
+TestHelper.cleanup_database(TestHelper.default_test_settings())
