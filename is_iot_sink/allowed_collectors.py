@@ -9,9 +9,10 @@ class AllowedCollectors:
         self.__settings = settings
         self.__collectors = {}
         try:
-            self.__expire_time = int(self.__settings.get("collectors/expireTime"))
+            self.__expire_time = self.__settings.get("collectors/expireTime")
         except IndexError:
             self.__expire_time = 3600
+        self.__registration_enabled = True if self.__settings.get("collectors/registrationEnabled").lower() == "true" else False
         self.__check_thread = threading.Thread(target=self.__check_all, daemon=True)
         self.__check_thread.start()
 

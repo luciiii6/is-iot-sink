@@ -28,6 +28,7 @@ mongo:
     irrigations: irrigations_test
 collectors:
   expireTime: 3600
+  registrationEnabled: 'true'
 irrigation:
   initialMode: manual
   automated:
