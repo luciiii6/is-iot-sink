@@ -22,10 +22,10 @@ valves:
 mongo:
   db: Thuia
   collections:
-    readings: readings_test
-    valves: valves_test
-    users: users_test
-    irrigations: irrigations_test
+    readings: readings
+    valves: valves
+    users: users
+    irrigations: irrigations
 collectors:
   expireTime: 3600
   registrationEnabled: 'true'
