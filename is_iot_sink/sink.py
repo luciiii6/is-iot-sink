@@ -26,13 +26,13 @@ class Sink:
         self.__valve_manager = ValveManager(self.__settings, self.__mongo_client)
         self.__allowed_collectors = AllowedCollectors(self.__settings)
         self.__mqtt_client = MQTTClient(self.__settings)
+        self.__mqtt_client.attach_queue(self.__queue_head)
         self.__irrigation_factory = IrrigationFactory(self.__settings, self.__valve_manager, self.__mongo_client, self.__allowed_collectors)
         self.__irrigation = self.__irrigation_factory.create(IrrigationMode.str_to_mode(self.__settings.get("irrigation/initialMode").upper()))
         self.__thread = threading.Thread(target = self.__process_data, daemon = True)
 
     def start(self):
         LOG.info("Sink application started.")
-        self.__mqtt_client.attach_queue(self.__queue_head)
         self.__irrigation.start()
         self.__running = True
         self.__thread.start()

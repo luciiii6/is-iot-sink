@@ -18,17 +18,3 @@ def test_suite_setup_stops_mqtt_broker():
     result = subprocess.run('sudo service mosquitto status'.split())
 
     assert result.returncode == STOPPED_RETURN_CODE
-
-def test_suite_setup_starts_local_mongodb():
-    TestHelper.suite_setup()
-
-    result = subprocess.run('sudo service mongodb status'.split())
-
-    assert result.returncode == STARTED_RETURN_CODE
-
-def test_suite_setup_stops_local_mongodb():
-    TestHelper.suite_teardown()
-
-    result = subprocess.run('sudo service mongodb status'.split())
-
-    assert result.returncode == STOPPED_RETURN_CODE
