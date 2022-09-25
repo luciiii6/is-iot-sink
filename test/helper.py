@@ -46,5 +46,3 @@ class TestHelper:
     @classmethod
     def cleanup_database(self, settings: Settings):
         MongoClient(settings).cleanup()
-
-TestHelper.cleanup_database(TestHelper.default_test_settings())
