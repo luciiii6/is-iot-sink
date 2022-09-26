@@ -76,25 +76,29 @@ class MongoClient:
 
     def read_first_appointment(self):
         col = self.db[self.__settings.get("mongo/collections/schedules")]
-        #todo change time
+
+        now = datetime.datetime.now()
+        in_24h = datetime.datetime.now() + datetime.timedelta(hours=24)
+
         pipeline = [
                       {
                         '$match': {
-                          'TIME': {
-                            '$lt': datetime.datetime.now + datetime.timedelta(hours=24),
-                            '$gt': datetime.datetime.now
+                          'timestamp': {
+                            '$lt': in_24h.timestamp(),
+                            '$gte': now.timestamp()
                           }
                         }
                       },
                       {
                         '$sort': {
-                        'TIME': -1
+                          'timestamp': -1
                         }
                       }
-            ]
-        appointments = col.aggregate(pipeline)
-
-        return appointments[0]
+                    ]
+        try:
+            return col.aggregate(pipeline).next()
+        except StopIteration:
+            return None
 
     def cleanup(self):
         for collection in self.__settings.get("mongo/collections").values():
