@@ -42,6 +42,9 @@ class Sink:
     def status(self):
         return self.__running and self.__thread.is_alive()
 
+    def irrigation_mode(self):
+        return self.__irrigation.mode
+
     def __process_data(self): 
         while self.__running:
             try:

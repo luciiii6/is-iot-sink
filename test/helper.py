@@ -40,9 +40,12 @@ class TestHelper:
 
     @classmethod
     def default_test_settings(self):
-        self.__settings_mutex = Lock()
-        return Settings(os.getenv('PROJECT_PATH') + '/setup_test.yml', self.__settings_mutex)
+        return Settings(os.getenv('PROJECT_PATH') + '/setup_test.yml')
 
     @classmethod
     def cleanup_database(self, settings: Settings):
         MongoClient(settings).cleanup()
+
+    @classmethod
+    def fixture_path(self, filename):
+        return os.getenv('PROJECT_PATH') + '/test/fixtures/' + filename
