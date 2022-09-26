@@ -26,6 +26,7 @@ mongo:
     valves: valves_test
     users: users_test
     irrigations: irrigations_test
+    schedules: schedules_test
 collectors:
   expireTime: 3600
   registrationEnabled: 'true'
