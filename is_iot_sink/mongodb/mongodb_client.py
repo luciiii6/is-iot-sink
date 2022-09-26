@@ -4,6 +4,7 @@ from is_iot_sink.settings import Settings
 import pymongo
 import os
 import time
+import datetime
 
 class MongoClient:
     def __init__(self, settings: Settings):
@@ -72,6 +73,28 @@ class MongoClient:
         col = self.db[self.__settings.get("mongo/collections/users")]
         user = col.find_one({'_id': ObjectId(user_id)})
         return user['Email']
+
+    def read_first_appointment(self):
+        col = self.db[self.__settings.get("mongo/collections/schedules")]
+        #todo change time
+        pipeline = [
+                      {
+                        '$match': {
+                          'TIME': {
+                            '$lt': datetime.datetime.now + datetime.timedelta(hours=24),
+                            '$gt': datetime.datetime.now
+                          }
+                        }
+                      },
+                      {
+                        '$sort': {
+                        'TIME': -1
+                        }
+                      }
+            ]
+        appointments = col.aggregate(pipeline)
+
+        return appointments[0]
 
     def cleanup(self):
         for collection in self.__settings.get("mongo/collections").values():
