@@ -18,20 +18,20 @@ class CollectorMock:
         self.__client.connect(self.__host, self.__port)
         self.__client.loop_start()
 
-    def connect(self):
+    def __connect(self):
         if not self.__client.is_connected():
             self.__client.connect(self.__host, self.__port)
 
-    def publish(self, topic: str, message: str):
-        self.connect()
+    def __publish(self, topic: str, message: str):
+        self.__connect()
         self.__client.publish(topic, message, self.__qos)
 
     def register(self, topic):
         register_message = json.dumps({'collectorId' : self.__id})
-        self.publish(topic, register_message)
+        self.__publish(topic, register_message)
 
     def send_dummy_data(self, topic):
-        self.publish(topic, self.__dummy_data())
+        self.__publish(topic, self.__dummy_data())
 
     def __dummy_data(self):
         return json.dumps(
