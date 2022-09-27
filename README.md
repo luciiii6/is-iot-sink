@@ -50,7 +50,7 @@ set -o allexport; source .env; set +o allexport
 
 ### Configure system setup
 ```
-nano setup.xml
+nano setup.yml
 ```
 
 ### Configure python path
@@ -72,8 +72,7 @@ python3 is_iot_sink/main.py
 ### Testing
 1. Install `mosquitto` MQTT Broker. More information [here](https://mosquitto.org/download/).
 ```
-sudo apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
-sudo apt-get update
+sudo apt-get install mosquitto
 ```
 2. MongoDB is not supported on ARM architecture for Debian, so no local configuration was setup on Raspberry Pi.
 3. Create test environment variables file and replace necessary variables.
@@ -95,4 +94,18 @@ python3 -m py_compile $(find * -type f | egrep -v '^env/|/env/|env' | egrep '.*\
 7. Run tests.
 ```
 pytest
+```
+
+### Known Environment Errors
+Error: `ImportError: libf77blas.so.3: cannot open shared object file: No such file or directory`
+
+Fix: `sudo apt-get install libatlas-base-dev`
+
+
+### Install `xrdp` to access RaspberryPi remotely with Remote Desktop Connection from Windows
+```
+sudo apt update
+sudo apt install xrdp
+systemctl show -p SubState --value xrdp
+sudo adduser xrdp ssl-cert
 ```
