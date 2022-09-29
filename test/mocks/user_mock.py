@@ -31,11 +31,11 @@ class UserMock(MQTTClientBase):
 
     def create_schedule(self, timestamp, duration):
         document = self.__create_schedule_document(timestamp, duration)
-        self.__mongo_client.insert_one(document, self.__settings.get("mongo/collections/schedules"))
+        self.__mongo_client.insert_one(document, self._settings.get("mongo/collections/schedules"))
 
     def __valve_action_message(self, valve_id, action):
         return json.dumps(
-            { 
+            {
                 "valveId": valve_id,
                 "action": action,
                 "userId": self.__user_id
@@ -43,7 +43,7 @@ class UserMock(MQTTClientBase):
 
     def __create_schedule_document(self, timestamp, duration):
         return json.dumps(
-            { 
+            {
                 "timestamp": timestamp,
                 "duration": duration
             })
