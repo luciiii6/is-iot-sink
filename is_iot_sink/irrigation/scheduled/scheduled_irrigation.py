@@ -55,3 +55,6 @@ class ScheduledIrrigation:
             if not self.running:
                 return False
         return True
+
+    def is_running(self):
+        return self.running
