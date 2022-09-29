@@ -26,7 +26,7 @@ def test_starts_valve_cycle():
     valve_manager = ValveManager(settings, mongo_client)
     scheduled_irrigation = ScheduledIrrigation(valve_manager, mongo_client)
     in_5_seconds = datetime.datetime.now() + datetime.timedelta(seconds=5)
-    duration = 5
+    duration = 1
 
     #Act
     user.create_schedule(in_5_seconds.timestamp(), duration)
@@ -36,6 +36,6 @@ def test_starts_valve_cycle():
     #Assert
     assert scheduled_irrigation.is_running() == True
 
-    time.sleep(30)
+    time.sleep(12)
     assert scheduled_irrigation.is_running() == False
 
