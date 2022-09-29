@@ -11,7 +11,6 @@ import threading
 
 class ScheduledIrrigation:
     def __init__(self, valve_manager: ValveManager, mongo_client: MongoClient):
-        super().__init__()
         self.__valve_manager = valve_manager
         self.__mongo_client = mongo_client
         self.mode = IrrigationMode.SCHEDULED
@@ -38,7 +37,7 @@ class ScheduledIrrigation:
             if appointment and copy_of_appointment != appointment and not self.__valve_manager.check_valve_cycle_running():
                 delay = self.__get_delay(appointment['timestamp'])
                 duration = appointment['duration']
-                self.__valve_manager.start_valves_cycle(duration, delay)
+                self.__valve_manager.start_valves_cycle(duration*60, delay)
                 copy_of_appointment = appointment
 
         self.__valve_manager.stop_valves_cycle()
