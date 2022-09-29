@@ -1,4 +1,5 @@
 name: Sink
+sinkId: '0000'
 location:
   latitude: 41.861248
   longitude: 23.722364
@@ -27,6 +28,7 @@ mongo:
     valves: valves
     users: users
     irrigations: irrigations
+    sinks: sinks
 collectors:
   expireTime: 3600
   registrationEnabled: 'true'
