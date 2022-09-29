@@ -76,7 +76,7 @@ class Sink:
                 else:
                     LOG.err("Unaccepted collector with id: {}".format(payload["collectorId"]))
             
-            elif message.topic.startswith(self.__settings.get('mqtt/topics/collector/errors')):
+            elif message.topic == self.__mqtt_client.errorsTopic:
                 users = self.__mongo_client.get_users_id_for_sink(self.__settings.get('sinkId'))
                 emails = [self.__mongo_client.get_user_email(user) for user in users]
                 collector_id = payload['collectorId']

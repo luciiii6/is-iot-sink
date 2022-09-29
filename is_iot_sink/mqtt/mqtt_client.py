@@ -14,7 +14,7 @@ class MQTTClient(MQTTClientBase):
         self.valvesTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/valves/control")
         self.valvesStatusRequestTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/valves/request")
         self.irrigationModeTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/irrigation/mode")
-
+        self.errorsTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/collector/errors")
         self._client.on_connect = self.__on_connect
         self._client.on_disconnect = self.__on_disconnect
         self._client.on_message = self.__on_message
@@ -24,6 +24,7 @@ class MQTTClient(MQTTClientBase):
         self.subscribe(self.valvesTopic)
         self.subscribe(self.valvesStatusRequestTopic)
         self.subscribe(self.irrigationModeTopic)
+        self.subscribe(self.errorsTopic)
 
     def attach_queue(self, queue_head: queue.Queue):
         self.__queue_head = queue_head

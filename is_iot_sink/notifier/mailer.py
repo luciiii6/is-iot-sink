@@ -22,7 +22,7 @@ class Mailer:
 
     def __prepare_message(self, log: str, collector_id: str, receiver):
         msg = EmailMessage()
-        msg.set_content('There was a problem with your irrigation system! \n\nErrors: ' + log + f'on collector: {collector_id}')
+        msg.set_content('There was a problem with your irrigation system! \n\nErrors: \'' + log + f'\' on collector: {collector_id}')
 
         msg['Subject'] = 'Irrigation System Error'
         msg['From'] = self.__sender
