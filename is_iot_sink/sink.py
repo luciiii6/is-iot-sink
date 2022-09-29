@@ -3,6 +3,7 @@ from is_iot_sink.mongodb.mongodb_client import MongoClient
 from is_iot_sink.allowed_collectors import AllowedCollectors
 from is_iot_sink.irrigation.irrigation_factory import *
 from is_iot_sink.mqtt.mqtt_client import MQTTClient
+from is_iot_sink.notifier.mailer import Mailer
 from is_iot_sink.logger import LOG
 from queue import Queue, Empty
 from threading import Lock
@@ -77,7 +78,13 @@ class Sink:
                 else:
                     LOG.err("Unaccepted collector with id: {}".format(payload["collectorId"]))
             
-            # TODO check for error msg
+            elif message.topic.startswith(self.__settings.get('mqtt/topics/collector/errors')):
+                users = self.__mongo_client.get_users_for_sink(self.__settings.get('sinkId'))
+                collector_id = payload['collectorId']
+                msg = payload['message']
+                mail = Mailer()
+                mail.send_mail(users, msg, collector_id)
+
 
             elif (message.topic.startswith(self.__settings.get("mqtt/topics/valves/control"))):
                 if self.__irrigation.mode == IrrigationMode.AUTO:

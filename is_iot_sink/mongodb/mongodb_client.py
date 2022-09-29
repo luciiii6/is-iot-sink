@@ -62,6 +62,12 @@ class MongoClient:
 
         return last_readings
 
+    def get_users_for_sink(self, sink_id: str):
+        col = self.db[self.__settings.get("mongo/collections/sinks")]
+        sink = col.find_one({'sinkId': sink_id})
+        users = sink['users']
+        return users
+
     def cleanup(self):
         for collection in self.__settings.get("mongo/collections").values():
             self.db[collection].delete_many({})
