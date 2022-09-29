@@ -70,7 +70,7 @@ class MongoClient:
     
     def get_user_email(self, user_id: str):
         col = self.db[self.__settings.get("mongo/collections/users")]
-        user = col.find_one({'_id': user_id})
+        user = col.find_one({'_id': ObjectId(user_id)})
         return user['Email']
 
     def cleanup(self):

@@ -82,7 +82,7 @@ class Sink:
                 users = self.__mongo_client.get_users_id_for_sink(self.__settings.get('sinkId'))
                 emails = [self.__mongo_client.get_user_email(user) for user in users]
                 collector_id = payload['collectorId']
-                msg = payload['message']
+                msg = payload['errors']
                 mail = Mailer()
                 mail.send_mail(emails, msg, collector_id)
 

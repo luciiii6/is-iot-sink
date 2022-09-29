@@ -1,6 +1,7 @@
 import os
 import smtplib, ssl
 from is_iot_sink.logger import LOG
+from email.message import EmailMessage
 
 
 class Mailer:
@@ -10,15 +11,21 @@ class Mailer:
         self.__sender = os.getenv('SMTP_SENDER')
         self.__password = os.getenv('SMTP_PASSWORD')
         
-    def send_mail(self, receivers: list, log: str = '', collectorId: str = ''):
-        message = self.__prepare_message(self, log, collectorId)
+    def send_mail(self, receivers: list, log: str = '', collector_id: str = ''):
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL(self.__smtp_server, self.__port, context=context) as server:
             server.login(self.__sender, self.__password)
             for receiver in receivers:
-                server.sendmail(self.__sender, receiver, message)
+                message = self.__prepare_message(log, collector_id, receiver)
+                server.send_message(message)
                 LOG.info(f'Email sent sucessfully to {receiver} !')
-    
-    def __prepare_message(self, log: str, collectorId: str):
-        msg = f'There was a problem with your irigation system! \n Error: {log} on {collectorId}'
+
+    def __prepare_message(self, log: str, collector_id: str, receiver):
+        msg = EmailMessage()
+        msg.set_content('There was a problem with your irrigation system! \n\nErrors: ' + log + f'on collector: {collector_id}')
+
+        msg['Subject'] = 'Irrigation System Error'
+        msg['From'] = self.__sender
+        msg['To'] = receiver
+
         return msg
