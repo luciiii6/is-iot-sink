@@ -76,6 +76,8 @@ class Sink:
                     self.__mongo_client.insert_one(payload, self.__settings.get("mongo/collections/readings"))
                 else:
                     LOG.err("Unaccepted collector with id: {}".format(payload["collectorId"]))
+            
+            # TODO check for error msg
 
             elif (message.topic.startswith(self.__settings.get("mqtt/topics/valves/control"))):
                 if self.__irrigation.mode == IrrigationMode.AUTO:

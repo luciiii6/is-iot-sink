@@ -10,6 +10,7 @@ mqtt:
     collector:
       registration: /collector/registration/
       data: /collector/data/
+      errors: /collector/errors/
     valves:
       control: /valves/control/
       request: /valves/status/request/
