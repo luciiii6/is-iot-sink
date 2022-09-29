@@ -4,7 +4,7 @@ Description=sink starter systemd service unit file.
 [Service]
 
 # The command that should be run when starting this service.
-ExecStart=/bin/bash /home/pi/is-iot-sink/is_iot_sink/main.py
+ExecStart=sink-run
 
 [Install]
 WantedBy=multi-user.target
