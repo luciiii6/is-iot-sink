@@ -47,7 +47,8 @@ def test_saves_collector_data_in_db():
 def test_irrigation_changes_to_scheduled():
     # Arrange
     settings = Settings(TestHelper.fixture_path('manual_irrigation_initial_mode_setup.yml'))
-    user = UserMock(settings)
+    mongo_client = MongoClient(settings)
+    user = UserMock(settings, mongo_client)
     sink = Sink(settings)
 
     # Act

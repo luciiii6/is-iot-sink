@@ -22,7 +22,7 @@ def test_starts_valve_cycle():
     # Arrange
     settings = Settings(TestHelper.fixture_path('scheduled_irrigation_initial_mode_setup.yml'))
     mongo_client = MongoClient(settings)
-    user = UserMock(settings)
+    user = UserMock(settings, mongo_client)
     valve_manager = ValveManager(settings, mongo_client)
     scheduled_irrigation = ScheduledIrrigation(valve_manager, mongo_client)
     in_5_seconds = datetime.datetime.now() + datetime.timedelta(seconds=5)
