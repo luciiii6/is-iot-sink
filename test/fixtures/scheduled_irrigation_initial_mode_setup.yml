@@ -31,6 +31,6 @@ collectors:
   expireTime: 3600
   registrationEnabled: 'true'
 irrigation:
-  initialMode: manual
+  initialMode: scheduled
   automated:
     last_readings_count: 5

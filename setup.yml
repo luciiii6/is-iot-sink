@@ -29,6 +29,7 @@ mongo:
     users: users
     irrigations: irrigations
     sinks: sinks
+    schedules: schedules
 collectors:
   expireTime: 3600
   registrationEnabled: 'true'
