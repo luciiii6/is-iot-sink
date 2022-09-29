@@ -11,7 +11,6 @@ import threading
 
 class ScheduledIrrigation:
     def __init__(self, valve_manager: ValveManager, mongo_client: MongoClient):
-        super().__init__()
         self.__valve_manager = valve_manager
         self.__mongo_client = mongo_client
         self.mode = IrrigationMode.SCHEDULED

@@ -26,7 +26,7 @@ class MongoClient:
         user = col.find_one({'UserName': 'admin'})
         return user['_id']
 
-    def read_last_readings(self, collector_ids):
+    def read_last_readings(self, collector_ids, count):
         col = self.db[self.__settings.get("mongo/collections/readings")]
 
         last_readings = []
@@ -54,7 +54,7 @@ class MongoClient:
                         'timestamp': -1
                     }
                 }, {
-                    '$limit': int(self.__settings.get("irrigation/automated/last_readings_count"))
+                    '$limit': count
                 }
             ]
             readings = col.aggregate(pipeline)
@@ -73,6 +73,11 @@ class MongoClient:
         col = self.db[self.__settings.get("mongo/collections/users")]
         user = col.find_one({'_id': ObjectId(user_id)})
         return user['Email']
+
+    def get_collectors_for_sink(self, sink_id: str):
+        col = self.db[self.__settings.get('mongo/collections/sinks')]
+        sink = col.find_one({'sinkId': sink_id})
+        return sink['collectors']
 
     def read_first_appointment(self):
         col = self.db[self.__settings.get("mongo/collections/schedules")]

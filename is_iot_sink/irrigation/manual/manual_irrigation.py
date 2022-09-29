@@ -3,7 +3,6 @@ from is_iot_sink.logger import LOG
 
 class ManualIrrigation:
     def __init__(self):
-        super().__init__()
         self.mode = IrrigationMode.MANUAL
 
     def start(self):
