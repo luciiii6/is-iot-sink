@@ -54,7 +54,7 @@ def test_irrigation_changes_to_scheduled():
     # Act
     sink.start()
     user.set_irrigation_mode(IrrigationMode.SCHEDULED)
-    time.sleep(1)
+    time.sleep(5)
 
     # Assert
     assert sink.status() == True
