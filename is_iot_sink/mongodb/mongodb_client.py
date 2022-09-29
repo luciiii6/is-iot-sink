@@ -62,11 +62,16 @@ class MongoClient:
 
         return last_readings
 
-    def get_users_for_sink(self, sink_id: str):
+    def get_users_id_for_sink(self, sink_id: str):
         col = self.db[self.__settings.get("mongo/collections/sinks")]
         sink = col.find_one({'sinkId': sink_id})
         users = sink['users']
         return users
+    
+    def get_user_email(self, user_id: str):
+        col = self.db[self.__settings.get("mongo/collections/users")]
+        user = col.find_one({'_id': user_id})
+        return user['Email']
 
     def cleanup(self):
         for collection in self.__settings.get("mongo/collections").values():

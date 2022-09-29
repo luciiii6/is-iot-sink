@@ -79,12 +79,12 @@ class Sink:
                     LOG.err("Unaccepted collector with id: {}".format(payload["collectorId"]))
             
             elif message.topic.startswith(self.__settings.get('mqtt/topics/collector/errors')):
-                users = self.__mongo_client.get_users_for_sink(self.__settings.get('sinkId'))
+                users = self.__mongo_client.get_users_id_for_sink(self.__settings.get('sinkId'))
+                emails = [self.__mongo_client.get_user_email(user) for user in users]
                 collector_id = payload['collectorId']
                 msg = payload['message']
                 mail = Mailer()
-                mail.send_mail(users, msg, collector_id)
-
+                mail.send_mail(emails, msg, collector_id)
 
             elif (message.topic.startswith(self.__settings.get("mqtt/topics/valves/control"))):
                 if self.__irrigation.mode == IrrigationMode.AUTO:
