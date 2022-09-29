@@ -14,6 +14,7 @@ class ValveManager:
         self.__mongo_client = mongo_client
         self.__valve_count = int(self.__settings.get('valves/count'))
         self.__gpios = self.__settings.get('valves/gpios')
+        self.__cycle_thread_running = False
         GPIO.setmode(GPIO.BCM)
         for gpio in self.__gpios:
             GPIO.setup(gpio, GPIO.OUT)
