@@ -8,21 +8,22 @@ from is_iot_sink.mqtt.mqtt_client_base import MQTTClientBase
 class MQTTClient(MQTTClientBase):
     def __init__(self, settings: Settings):
         super().__init__(settings, settings.get("name"))
-        self.__registrationTopic = self._settings.get("mqtt/topics/collector/registration")
-        self.__dataTopic = self._settings.get("mqtt/topics/collector/data")
-        self.__valvesTopic = self._settings.get("mqtt/topics/valves/control")
-        self.__valvesStatusRequestTopic = self._settings.get("mqtt/topics/valves/request")
-        self.__irrigationModeTopic = self._settings.get("mqtt/topics/irrigation/mode")
+        self.__sink_id = self._settings.get('sinkId')
+        self.registrationTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/collector/registration")
+        self.dataTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/collector/data")
+        self.valvesTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/valves/control")
+        self.valvesStatusRequestTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/valves/request")
+        self.irrigationModeTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/irrigation/mode")
 
         self._client.on_connect = self.__on_connect
         self._client.on_disconnect = self.__on_disconnect
         self._client.on_message = self.__on_message
 
-        self.subscribe(self.__registrationTopic)
-        self.subscribe(self.__dataTopic)
-        self.subscribe(self.__valvesTopic)
-        self.subscribe(self.__valvesStatusRequestTopic)
-        self.subscribe(self.__irrigationModeTopic)
+        self.subscribe(self.registrationTopic)
+        self.subscribe(self.dataTopic)
+        self.subscribe(self.valvesTopic)
+        self.subscribe(self.valvesStatusRequestTopic)
+        self.subscribe(self.irrigationModeTopic)
 
     def attach_queue(self, queue_head: queue.Queue):
         self.__queue_head = queue_head
