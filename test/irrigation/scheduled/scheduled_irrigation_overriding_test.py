@@ -34,7 +34,7 @@ def test_starts_valve_cycle():
     user.create_schedule(in_5_seconds.timestamp(), duration)
     # scheduling it
     user.create_schedule(in_25_seconds.timestamp(), duration)
-    ScheduledIrrigation.start()
+    scheduled_irrigation.start()
     time.sleep(1)
 
     #Assert
