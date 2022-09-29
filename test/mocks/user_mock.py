@@ -30,7 +30,7 @@ class UserMock(MQTTClientBase):
         self.publish(topic, message)
 
     def create_schedule(self, timestamp, duration):
-        document = self.__create_schedule_document(timestamp, duration)
+        document = self.__create_schedule_document_nodump(timestamp, duration)
         self.__mongo_client.insert_one(document, self._settings.get("mongo/collections/schedules"))
 
     def __valve_action_message(self, valve_id, action):
@@ -47,3 +47,9 @@ class UserMock(MQTTClientBase):
                 "timestamp": timestamp,
                 "duration": duration
             })
+
+    def __create_schedule_document_nodump(self, timestamp, duration):
+        return {
+                "timestamp": timestamp,
+                "duration": duration
+               }
