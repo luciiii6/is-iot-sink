@@ -41,6 +41,6 @@ def test_starts_valve_cycle():
     assert scheduled_irrigation.is_running() == True
 
     #the first irrigation should end at 12s point, the second assert here should mark 1+12s point
-    time.sleep(12)
+    time.sleep(15)
     assert scheduled_irrigation.is_running() == False
 
