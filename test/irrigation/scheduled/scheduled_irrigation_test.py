@@ -36,6 +36,6 @@ def test_starts_valve_cycle():
     #Assert
     assert scheduled_irrigation.is_running() == True
 
-    time.sleep(12)
+    time.sleep(15)
     assert scheduled_irrigation.is_running() == False
 
