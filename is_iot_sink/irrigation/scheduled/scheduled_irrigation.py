@@ -31,22 +31,24 @@ class ScheduledIrrigation:
         self.global_thread.join()
 
     def __run(self):
+        appointment = None
+        copy_of_appointment = None
 
-        #to do
         while self.running:
             appointment = self.__mongo_client.read_first_appointment()
 
-            if appointment is not None:
+            if appointment and copy_of_appointment != appointment and not self.__valve_manager.check_valve_cycle_running():
                 delay = self.__get_delay(appointment['timestamp'])
                 duration = appointment['duration']
                 self.__valve_manager.start_valves_cycle(duration, delay)
+                copy_of_appointment = appointment
+
+        self.__valve_manager.stop_valves_cycle()
 
 
-
-        return
 
     def __get_delay(self, timestamp):
-        return timestamp - datetime.datetime.now().timestamp()
+        return int(timestamp - datetime.datetime.now().timestamp())
 
     def __sleep(self, secs):
         while secs >= 0:
