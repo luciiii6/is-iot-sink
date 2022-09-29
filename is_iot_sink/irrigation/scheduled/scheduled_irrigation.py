@@ -1,8 +1,6 @@
 import datetime
 
-from is_iot_sink.allowed_collectors import AllowedCollectors
 from is_iot_sink.irrigation.irrigation_mode import *
-from is_iot_sink.irrigation.automated.flc import flc
 from is_iot_sink.irrigation.valves.valves_manager import ValveManager
 from is_iot_sink.mongodb.mongodb_client import MongoClient
 from is_iot_sink.settings import Settings
