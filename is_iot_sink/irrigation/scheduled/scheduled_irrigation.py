@@ -42,14 +42,13 @@ class ScheduledIrrigation:
             if appointment and copy_of_appointment != appointment and not self.__valve_manager.check_valve_cycle_running():
                 delay = self.__get_delay(appointment['timestamp'])
                 duration = appointment['duration']
-
-
                 self.__valve_manager.start_valves_cycle(duration*60, delay)
                 copy_of_appointment = appointment
 
             if appointment:
-                if self.__check_for_rain_in_next_hours(appointment):
+                if self.__is_raining_next_hour(appointment):
                     self.__send_mail()
+
 
         self.__valve_manager.stop_valves_cycle()
 
@@ -64,7 +63,7 @@ class ScheduledIrrigation:
         mail.send_mail_for_rain_probability(emails, msg)
 
 
-    def __check_for_rain_in_next_hours(self, appointment):
+    def __is_raining_next_hour(self, appointment):
         current_timestamp = datetime.datetime.now().timestamp()
         appointment_timestamp = appointment['timestamp']
         next_hours_timestamp = current_timestamp + 3600
@@ -73,10 +72,10 @@ class ScheduledIrrigation:
             probability = self.__rain_probability()
 
             if probability > self.RAIN_PROB_THRESHOLD:
-                return False
+                return True
 
 
-        return True
+        return False
 
     def __get_delay(self, timestamp):
         return int(timestamp - datetime.datetime.now().timestamp())
