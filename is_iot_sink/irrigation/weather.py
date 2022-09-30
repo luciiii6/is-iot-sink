@@ -25,6 +25,11 @@ class Weather:
         response = req.get(url_request)
         return response.json()
 
+    def get_custom_hour_data(self, next_hours):
+        url_request = f'http://dataservice.accuweather.com/forecasts/v1/hourly/{next_hours}hour/{self.location_id}?apikey={self.api_key}&details=true&metric=true'
+        response = req.get(url_request)
+        return response.json()
+
     def __create_location_id(self):
         url_request = f'http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey={self.api_key}&q={self.latitude}%2C{self.longitude}'
         response = req.get(url_request)

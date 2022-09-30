@@ -28,15 +28,21 @@ class Mailer:
                 message = self.__prepare_message(log, collector_id, receiver)
                 server.send_message(message)
                 LOG.info(f'Email sent sucessfully to {receiver} !')
-    
-    def send_mail_for_sink_errors(self, receivers: list, errors: str):
+
+    def send_mail_for_rain_probability(self, receivers: list, message):
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL(self.__smtp_server, self.__port, context=context) as server:
             server.login(self.__sender, self.__password)
             for receiver in receivers:
-                message = self.__prepare_message_for_sink(receiver, errors)
-                server.send_message(message)
+                msg = EmailMessage()
+                msg.set_content(message)
+
+                msg['Subject'] = 'Irrigation System Notification'
+                msg['From'] = self.__sender
+                msg['To'] = receiver
+                server.send_message(msg)
                 LOG.info(f'Email sent sucessfully to {receiver} !')
+
 
     def __prepare_message(self, log: str, collector_id: str, receiver):
         msg = EmailMessage()
