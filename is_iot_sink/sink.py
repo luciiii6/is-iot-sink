@@ -105,7 +105,7 @@ class Sink:
                     continue
     
             elif message.topic == self.__mqtt_client.valvesStatusRequestTopic:
-                self.__mqtt_client.publish(self.__settings.get("mqtt/topics/valves/response"), self.__valve_manager.get_status())
+                self.__mqtt_client.publish(self.__mqtt_client.valvesStatusResponseTopic, self.__valve_manager.get_status())
             
             elif message.topic == self.__mqtt_client.irrigationModeTopic:
                 new_mode = IrrigationMode.str_to_mode(payload["mode"].upper())

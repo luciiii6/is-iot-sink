@@ -13,6 +13,7 @@ class MQTTClient(MQTTClientBase):
         self.dataTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/collector/data")
         self.valvesTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/valves/control")
         self.valvesStatusRequestTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/valves/request")
+        self.valvesStatusResponseTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/valves/response")
         self.irrigationModeTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/irrigation/mode")
         self.errorsTopic = f'/{self.__sink_id}' + self._settings.get("mqtt/topics/collector/errors")
         self._client.on_connect = self.__on_connect
