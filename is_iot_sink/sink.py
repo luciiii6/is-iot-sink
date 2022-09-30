@@ -3,6 +3,7 @@ from is_iot_sink.mongodb.mongodb_client import MongoClient
 from is_iot_sink.allowed_collectors import AllowedCollectors
 from is_iot_sink.irrigation.irrigation_factory import *
 from is_iot_sink.mqtt.mqtt_client import MQTTClient
+from is_iot_sink.notifier.mailer import Mailer
 from is_iot_sink.logger import LOG
 from queue import Queue, Empty
 from threading import Lock
@@ -13,13 +14,8 @@ import json
 import os
 
 class Sink:
-    def __init__(self, settings=None):
-        if settings == None:
-            self.__settings_mutex = Lock()
-            self.__settings = Settings(os.getenv('PROJECT_PATH') + '/setup.yml', self.__settings_mutex)
-        else:
-            self.__settings = settings
-
+    def __init__(self, settings = Settings()):
+        self.__settings = settings
         self.__queue_head = Queue(maxsize = 0)
         self.__running = False
         self.__mongo_client = MongoClient(self.__settings)
@@ -46,6 +42,9 @@ class Sink:
     def status(self):
         return self.__running and self.__thread.is_alive()
 
+    def irrigation_mode(self):
+        return self.__irrigation.mode
+
     def __process_data(self): 
         while self.__running:
             try:
@@ -65,19 +64,27 @@ class Sink:
 
             LOG.info("<{}> [{}]".format(message.topic, payload))
             
-            if (message.topic == self.__settings.get("mqtt/topics/collector/registration")):
+            if message.topic == self.__mqtt_client.registrationTopic:
                 self.__allowed_collectors.add(payload["collectorId"])
                 LOG.info("Collector [{}] accepted.".format(payload["collectorId"]))
 
-            elif (message.topic.startswith(self.__settings.get("mqtt/topics/collector/data"))):
+            elif message.topic == self.__mqtt_client.dataTopic:
                 if self.__allowed_collectors.is_allowed(payload["collectorId"]):
                     # TODO: check last readings before inserting data
                     # TODO: validate fields 
                     self.__mongo_client.insert_one(payload, self.__settings.get("mongo/collections/readings"))
                 else:
                     LOG.err("Unaccepted collector with id: {}".format(payload["collectorId"]))
+            
+            elif message.topic == self.__mqtt_client.errorsTopic:
+                users = self.__mongo_client.get_users_id_for_sink(self.__settings.get('sinkId'))
+                emails = [self.__mongo_client.get_user_email(user) for user in users]
+                collector_id = payload['collectorId']
+                msg = payload['errors']
+                mail = Mailer()
+                mail.send_mail(emails, msg, collector_id)
 
-            elif (message.topic.startswith(self.__settings.get("mqtt/topics/valves/control"))):
+            elif message.topic == self.__mqtt_client.valvesTopic:
                 if self.__irrigation.mode == IrrigationMode.AUTO:
                     LOG.info("Irrigation is in auto mode. Ignoring all valves control...")
                     continue
@@ -86,9 +93,9 @@ class Sink:
                     valve = payload['valveId']
                     action = payload['action'].upper()
                     userId = payload['userId']
-                    if (action == "TURN_ON"):
+                    if action == "TURN_ON":
                         self.__valve_manager.turn_on_by_number(valve, userId)
-                    elif (action == "TURN_OFF"):
+                    elif action == "TURN_OFF":
                         self.__valve_manager.turn_off_by_number(valve, userId)
                     else:
                         LOG.err("Invalid valve action request! [{}]".format(action))
@@ -97,16 +104,16 @@ class Sink:
                     LOG.err("Invalid format for valve control request!")
                     continue
     
-            elif (message.topic.startswith(self.__settings.get("mqtt/topics/valves/request"))):
-                self.__mqtt_client.publish(self.__settings.get("mqtt/topics/valves/response"), self.__valve_manager.get_status())
+            elif message.topic == self.__mqtt_client.valvesStatusRequestTopic:
+                self.__mqtt_client.publish(self.__mqtt_client.valvesStatusResponseTopic, self.__valve_manager.get_status())
             
-            elif (message.topic.startswith(self.__settings.get("mqtt/topics/irrigation/mode"))):
+            elif message.topic == self.__mqtt_client.irrigationModeTopic:
                 new_mode = IrrigationMode.str_to_mode(payload["mode"].upper())
-                if (new_mode == None):
+                if new_mode is None:
                     LOG.err("Invalid irrigation mode configuration!")
                     continue
 
-                if (new_mode == self.__irrigation.mode):
+                if new_mode == self.__irrigation.mode:
                     LOG.info("Irrigation mode is already: [{}]".format(IrrigationMode.mode_to_str(self.__irrigation.mode)))
                 else:
                     LOG.info("Irrigation mode switched to: [{}]".format(payload["mode"].upper()))

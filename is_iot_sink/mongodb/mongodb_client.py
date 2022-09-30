@@ -4,6 +4,7 @@ from is_iot_sink.settings import Settings
 import pymongo
 import os
 import time
+import datetime
 
 class MongoClient:
     def __init__(self, settings: Settings):
@@ -25,7 +26,7 @@ class MongoClient:
         user = col.find_one({'UserName': 'admin'})
         return user['_id']
 
-    def read_last_readings(self, collector_ids):
+    def read_last_readings(self, collector_ids, count):
         col = self.db[self.__settings.get("mongo/collections/readings")]
 
         last_readings = []
@@ -53,7 +54,7 @@ class MongoClient:
                         'timestamp': -1
                     }
                 }, {
-                    '$limit': int(self.__settings.get("irrigation/automated/last_readings_count"))
+                    '$limit': count
                 }
             ]
             readings = col.aggregate(pipeline)
@@ -61,6 +62,48 @@ class MongoClient:
                 last_readings.append(reading)
 
         return last_readings
+
+    def get_users_id_for_sink(self, sink_id: str):
+        col = self.db[self.__settings.get("mongo/collections/sinks")]
+        sink = col.find_one({'sinkId': sink_id})
+        users = sink['users']
+        return users
+    
+    def get_user_email(self, user_id: str):
+        col = self.db[self.__settings.get("mongo/collections/users")]
+        user = col.find_one({'_id': ObjectId(user_id)})
+        return user['Email']
+
+    def get_collectors_for_sink(self, sink_id: str):
+        col = self.db[self.__settings.get('mongo/collections/sinks')]
+        sink = col.find_one({'sinkId': sink_id})
+        return sink['collectors']
+
+    def read_first_appointment(self):
+        col = self.db[self.__settings.get("mongo/collections/schedules")]
+
+        now = datetime.datetime.now()
+        in_24h = datetime.datetime.now() + datetime.timedelta(hours=24)
+
+        pipeline = [
+                      {
+                        '$match': {
+                          'timestamp': {
+                            '$lt': in_24h.timestamp(),
+                            '$gte': now.timestamp()
+                          }
+                        }
+                      },
+                      {
+                        '$sort': {
+                          'timestamp': -1
+                        }
+                      }
+                    ]
+        try:
+            return col.aggregate(pipeline).next()
+        except StopIteration:
+            return None
 
     def cleanup(self):
         for collection in self.__settings.get("mongo/collections").values():

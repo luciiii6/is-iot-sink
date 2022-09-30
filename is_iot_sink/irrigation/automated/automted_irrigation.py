@@ -16,7 +16,6 @@ RECHECK_TIMEOUT = 15 * 60          # seconds
 
 class AutomatedIrrigation:
     def __init__(self, settings: Settings, valve_manager: ValveManager, mongo_client: MongoClient, allowed_collectors: AllowedCollectors):
-        super().__init__()
         self.__settings = settings
         self.__valve_manager = valve_manager
         self.__mongo_client = mongo_client
@@ -40,7 +39,10 @@ class AutomatedIrrigation:
     def __run(self):
         while self.running:
             try:
-                readings = self.__mongo_client.read_last_readings(self.__allowed_collectors.get_all())
+                readings = self.__mongo_client.read_last_readings(
+                    self.__allowed_collectors.get_all(), 
+                    self.__settings.get("irrigation/automated/last_readings_count"))
+
                 average = self.__calculate_average(readings)
                 irrigation_time = flc.solve(
                     average['soilMoisture'],

@@ -1,0 +1,9 @@
+[Unit]
+Description=sink starter systemd service unit file.
+
+[Service]
+# The command that should be run when starting this service.
+ExecStart=/bin/bash /usr/local/bin/startup.sh
+
+[Install]
+WantedBy=multi-user.target
