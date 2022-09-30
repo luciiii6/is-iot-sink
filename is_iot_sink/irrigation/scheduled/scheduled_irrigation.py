@@ -18,6 +18,7 @@ class ScheduledIrrigation:
         self.running = False
         self.global_thread = threading.Thread(target=self.__run, daemon=True)
         self.weather = Weather(self.__settings.get("location/latitude"), self.__settings.get("location/longitude"))
+        self.__email_sent = False
 
     def start(self):
         LOG.info("Scheduled Irrigation process started.")
@@ -43,11 +44,13 @@ class ScheduledIrrigation:
                 delay = self.__get_delay(appointment['timestamp'])
                 duration = appointment['duration']
                 self.__valve_manager.start_valves_cycle(duration*60, delay)
+                self.__email_sent = False
                 copy_of_appointment = appointment
 
             if appointment:
-                if self.__is_raining_next_hour(appointment):
+                if self.__is_raining_next_hour(appointment) and self.__email_sent == False:
                     self.__send_mail()
+                    self.__email_sent = True
 
 
         self.__valve_manager.stop_valves_cycle()
